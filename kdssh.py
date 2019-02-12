@@ -31,13 +31,11 @@ class kdssh(QMainWindow):
         self.sshconfig.show()
         self.sshconfig.new_item_flag = False
         item = self.lw_confs.currentItem()
-        print(item.text())
         self.sshconfig.edit_conf(item.text())
 
     @pyqtSlot()
     def on_pb_delconf_clicked(self):
         item = self.lw_confs.currentItem()
-        print(item.text())
         self.sshconfig.del_conf(item.text())
         self.lw_confs.removeItemWidget(
             self.lw_confs.takeItem(self.lw_confs.currentRow())
@@ -46,7 +44,6 @@ class kdssh(QMainWindow):
     @pyqtSlot()
     def on_pb_connect_clicked(self):
         item = self.lw_confs.currentItem()
-        print(item.text())
         for conf in self.confs:
             if conf["solution"] == item.text():
                 self.ssh_connect(conf)

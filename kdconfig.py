@@ -13,16 +13,13 @@ class sshconfig(QDialog):
     def __init__(self):
         super(sshconfig, self).__init__()
         loadUi("kdconfig.ui", self)
-        print("init sshconfig")
         self.config_file = os.environ["HOME"] + "/.config/kdssh/conf.json"
-        print(self.config_file)
         self.init_confs()
 
     def init_confs(self):
         check_and_create(self.config_file)
         with open(self.config_file, "r") as f:
             content = f.read()
-            print("content:" + content)
             if content.strip() != "":
                 json_content = json.loads(content)
                 self.confs = json_content
@@ -31,7 +28,6 @@ class sshconfig(QDialog):
 
     @pyqtSlot()
     def on_buttonBox_accepted(self):
-        print("accepted")
         conf = {}
         conf["solution"] = self.le_solution.text()
         conf["host"] = self.le_host.text()
@@ -41,12 +37,20 @@ class sshconfig(QDialog):
 
         if self.new_item_flag:
             self.confs.append(conf)
+            # 更新界面的列表
             self.lw_confs.addItem(conf["solution"])
         else:
             for item in self.confs:
-                if conf["solution"] == item["solution"]:
+                if self.temp_solution == item["solution"]:
                     self.confs.remove(item)
                     self.confs.append(conf)
+
+                    # 更新界面的列表
+                    if self.temp_solution != conf["solution"]:
+                        self.lw_confs.removeItemWidget(
+                            self.lw_confs.takeItem(self.lw_confs.currentRow())
+                        )
+                        self.lw_confs.addItem(conf["solution"])
         self.update_confs()
 
     def edit_conf(self, solution):
@@ -57,6 +61,7 @@ class sshconfig(QDialog):
                 self.le_port.setText(conf["port"])
                 self.le_name.setText(conf["name"])
                 self.le_password.setText(conf["password"])
+                self.temp_solution = solution
 
     def del_conf(self, conf_solution):
         for item in self.confs:
